@@ -2,7 +2,6 @@ import cron from "node-cron";
 import BorrowRecord from "../modules/borrow/borrow.model";
 import Fine from "../modules/fine/fine.model";
 import Member from "../modules/member/member.model";
-import User from "../modules/user/user.model";
 import Reservation from "../modules/reservation/reservation.model";
 import Book from "../modules/book/book.model";
 import { sendEmail, emailTemplates } from "../utils/email";

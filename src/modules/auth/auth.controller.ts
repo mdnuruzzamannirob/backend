@@ -14,11 +14,21 @@ const COOKIE_OPTIONS = {
 
 const register = catchAsync(async (req: Request, res: Response) => {
   const result = await AuthService.register(req.body);
-  res.cookie("refreshToken", result.refreshToken, COOKIE_OPTIONS);
   sendResponse(res, {
     success: true,
     statusCode: StatusCodes.CREATED,
-    message: "User registered successfully",
+    message: result.message,
+    data: null,
+  });
+});
+
+const verifyEmail = catchAsync(async (req: Request, res: Response) => {
+  const result = await AuthService.verifyEmail(req.body);
+  res.cookie("refreshToken", result.refreshToken, COOKIE_OPTIONS);
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: "Email verified successfully",
     data: { accessToken: result.accessToken },
   });
 });
@@ -70,8 +80,18 @@ const forgotPassword = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     success: true,
     statusCode: StatusCodes.OK,
-    message: "If the email exists, a password reset link has been sent",
+    message: "If the email exists, a password reset OTP has been sent",
     data: null,
+  });
+});
+
+const verifyResetOtp = catchAsync(async (req: Request, res: Response) => {
+  const result = await AuthService.verifyResetOtp(req.body);
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: "OTP verified successfully",
+    data: result,
   });
 });
 
@@ -85,12 +105,25 @@ const resetPassword = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const resendOtp = catchAsync(async (req: Request, res: Response) => {
+  await AuthService.resendOtp(req.body);
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: "OTP resent successfully",
+    data: null,
+  });
+});
+
 export const AuthController = {
   register,
+  verifyEmail,
   login,
   refreshToken,
   changePassword,
   logout,
   forgotPassword,
+  verifyResetOtp,
   resetPassword,
+  resendOtp,
 };

@@ -23,7 +23,22 @@ export interface IForgotPasswordPayload {
   email: string;
 }
 
+export interface IVerifyEmailPayload {
+  email: string;
+  otp: string;
+}
+
+export interface IVerifyResetOtpPayload {
+  email: string;
+  otp: string;
+}
+
+export interface IResendOtpPayload {
+  email: string;
+  type: "email_verification" | "password_reset";
+}
+
 export interface IResetPasswordPayload {
-  token: string;
+  resetToken: string;
   newPassword: string;
 }

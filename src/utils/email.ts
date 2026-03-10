@@ -130,4 +130,38 @@ export const emailTemplates = {
       </div>
     `,
   }),
+
+  otpVerification: (name: string, otp: string) => ({
+    subject: "Verify Your Email - Library Management System",
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2>Email Verification</h2>
+        <p>Hi ${name},</p>
+        <p>Thank you for registering. Use the OTP below to verify your email address:</p>
+        <div style="text-align: center; margin: 30px 0;">
+          <span style="font-size: 36px; font-weight: bold; letter-spacing: 8px; color: #007bff;">${otp}</span>
+        </div>
+        <p>This OTP expires in <strong>10 minutes</strong>.</p>
+        <p>If you did not create an account, please ignore this email.</p>
+        <p>Best regards,<br/>Library Management Team</p>
+      </div>
+    `,
+  }),
+
+  passwordResetOtp: (name: string, otp: string) => ({
+    subject: "Password Reset OTP - Library Management System",
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2>Password Reset OTP</h2>
+        <p>Hi ${name},</p>
+        <p>You requested a password reset. Use the OTP below to proceed:</p>
+        <div style="text-align: center; margin: 30px 0;">
+          <span style="font-size: 36px; font-weight: bold; letter-spacing: 8px; color: #dc3545;">${otp}</span>
+        </div>
+        <p>This OTP expires in <strong>10 minutes</strong>.</p>
+        <p>If you did not request a password reset, please ignore this email.</p>
+        <p>Best regards,<br/>Library Management Team</p>
+      </div>
+    `,
+  }),
 };

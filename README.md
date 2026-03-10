@@ -193,15 +193,18 @@ Base URL: `http://localhost:5000/api/v1`
 
 ### Authentication
 
-| Method | Endpoint                | Auth | Description               |
-| ------ | ----------------------- | ---- | ------------------------- |
-| POST   | `/auth/register`        | ❌   | Register a new user       |
-| POST   | `/auth/login`           | ❌   | Login                     |
-| POST   | `/auth/refresh-token`   | ❌   | Refresh access token      |
-| POST   | `/auth/change-password` | ✅   | Change password           |
-| POST   | `/auth/forgot-password` | ❌   | Send password reset email |
-| POST   | `/auth/reset-password`  | ❌   | Reset password with token |
-| POST   | `/auth/logout`          | ✅   | Logout                    |
+| Method | Endpoint                 | Auth | Description                                    |
+| ------ | ------------------------ | ---- | ---------------------------------------------- |
+| POST   | `/auth/register`         | ❌   | Register (sends email verification OTP)        |
+| POST   | `/auth/verify-email`     | ❌   | Verify email with OTP → returns tokens         |
+| POST   | `/auth/resend-otp`       | ❌   | Resend OTP (email_verification/password_reset) |
+| POST   | `/auth/login`            | ❌   | Login (requires verified email)                |
+| POST   | `/auth/refresh-token`    | ❌   | Refresh access token                           |
+| POST   | `/auth/change-password`  | ✅   | Change password                                |
+| POST   | `/auth/forgot-password`  | ❌   | Send password reset OTP to email               |
+| POST   | `/auth/verify-reset-otp` | ❌   | Verify reset OTP → returns resetToken          |
+| POST   | `/auth/reset-password`   | ❌   | Reset password with resetToken                 |
+| POST   | `/auth/logout`           | ✅   | Logout                                         |
 
 ### Users
 
@@ -373,11 +376,32 @@ Base URL: `http://localhost:5000/api/v1`
 - **Helmet** — Security HTTP headers
 - **CORS** — Configurable cross-origin resource sharing
 - **Rate Limiting** — 100 requests/15min (API), 20 requests/15min (auth)
-- **bcrypt** — Password hashing (configurable salt rounds)
+- **bcrypt** — Password hashing + OTP hashing (configurable salt rounds)
 - **JWT** — Access token (15min) + HttpOnly refresh token cookie (7days)
+- **OTP** — 6-digit numeric, bcrypt-hashed, MongoDB TTL auto-expiry (10min)
 - **Zod** — Request body/params/query validation
 - **Soft Deletes** — Data is never permanently deleted
 - **Input Sanitization** — Body size limits (10KB)
+
+---
+
+## 🔑 Authentication Flows
+
+### Registration with Email Verification
+
+```
+POST /auth/register        → creates unverified user, sends OTP email
+POST /auth/verify-email    → { email, otp } → verifies, sends welcome email, returns tokens
+POST /auth/resend-otp      → { email, type: "email_verification" } → resend OTP
+```
+
+### Password Reset (OTP-based)
+
+```
+POST /auth/forgot-password   → { email } → sends OTP email
+POST /auth/verify-reset-otp  → { email, otp } → returns { resetToken }
+POST /auth/reset-password    → { resetToken, newPassword } → updates password
+```
 
 ---
 

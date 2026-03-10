@@ -1,5 +1,4 @@
 import multer from "multer";
-import path from "path";
 import AppError from "../errors/AppError";
 import { StatusCodes } from "http-status-codes";
 

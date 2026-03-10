@@ -8,6 +8,7 @@ export interface IUser extends Document {
   password: string;
   role: TUserRole;
   isActive: boolean;
+  isVerified: boolean;
   isDeleted: boolean;
   passwordChangedAt?: Date;
 }

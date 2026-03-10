@@ -16,6 +16,7 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>(
     password: { type: String, required: true, select: false },
     role: { type: String, enum: ["user", "admin"], default: "user" },
     isActive: { type: Boolean, default: true },
+    isVerified: { type: Boolean, default: false },
     isDeleted: { type: Boolean, default: false },
     passwordChangedAt: { type: Date },
   },

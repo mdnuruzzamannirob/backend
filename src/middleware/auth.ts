@@ -24,6 +24,12 @@ const auth = (...requiredRoles: TUserRole[]) => {
       if (!user.isActive) {
         throw new AppError("Account is deactivated", StatusCodes.FORBIDDEN);
       }
+      if (!user.isVerified) {
+        throw new AppError(
+          "Email not verified. Please verify your email first.",
+          StatusCodes.FORBIDDEN,
+        );
+      }
       if (user.isPasswordChangedAfter(decoded.iat as number)) {
         throw new AppError(
           "Password changed recently. Please log in again",
