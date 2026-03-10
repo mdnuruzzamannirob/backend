@@ -5,6 +5,7 @@ import Book from "../book/book.model";
 import Member from "../member/member.model";
 import AppError from "../../errors/AppError";
 import { FineService } from "../fine/fine.service";
+import { ReservationService } from "../reservation/reservation.service";
 
 interface BorrowQueryOptions {
   page?: number;
@@ -166,6 +167,9 @@ const returnBook = async (
     }
 
     await session.commitTransaction();
+
+    // Notify next person in reservation queue
+    await ReservationService.notifyNextInQueue(record.book.toString());
 
     return BorrowRecord.findById(recordId)
       .populate("book")

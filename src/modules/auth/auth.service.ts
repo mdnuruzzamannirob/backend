@@ -8,7 +8,10 @@ import {
   IRegisterPayload,
   ITokenPayload,
   IChangePasswordPayload,
+  IForgotPasswordPayload,
+  IResetPasswordPayload,
 } from "./auth.interface";
+import { sendEmail, emailTemplates } from "../../utils/email";
 
 const createToken = (
   payload: ITokenPayload,
@@ -40,6 +43,14 @@ const register = async (payload: IRegisterPayload) => {
     config.JWT_REFRESH_SECRET,
     config.JWT_REFRESH_EXPIRES_IN,
   );
+
+  // Send welcome email
+  const template = emailTemplates.welcome(user.name);
+  await sendEmail({
+    to: user.email,
+    subject: template.subject,
+    html: template.html,
+  });
 
   return { accessToken, refreshToken };
 };
@@ -140,9 +151,57 @@ const changePassword = async (
   return null;
 };
 
+const forgotPassword = async (payload: IForgotPasswordPayload) => {
+  const user = await User.findOne({ email: payload.email });
+  if (!user) {
+    // Don't reveal if user exists
+    return null;
+  }
+
+  const resetToken = createToken(
+    { userId: user._id.toString(), role: user.role },
+    config.JWT_ACCESS_SECRET,
+    config.PASSWORD_RESET_EXPIRES_IN,
+  );
+
+  const resetLink = `${config.CLIENT_URL}/reset-password?token=${resetToken}`;
+  const template = emailTemplates.passwordReset(user.name, resetLink);
+
+  await sendEmail({
+    to: user.email,
+    subject: template.subject,
+    html: template.html,
+  });
+
+  return null;
+};
+
+const resetPassword = async (payload: IResetPasswordPayload) => {
+  let decoded: JwtPayload;
+  try {
+    decoded = jwt.verify(payload.token, config.JWT_ACCESS_SECRET) as JwtPayload;
+  } catch {
+    throw new AppError(
+      "Invalid or expired reset token",
+      StatusCodes.BAD_REQUEST,
+    );
+  }
+
+  const user = await User.findById(decoded.userId).select("+password");
+  if (!user) {
+    throw new AppError("User not found", StatusCodes.NOT_FOUND);
+  }
+
+  user.password = payload.newPassword;
+  await user.save();
+  return null;
+};
+
 export const AuthService = {
   register,
   login,
   refreshAccessToken,
   changePassword,
+  forgotPassword,
+  resetPassword,
 };

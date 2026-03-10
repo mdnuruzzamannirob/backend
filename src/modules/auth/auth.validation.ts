@@ -45,9 +45,26 @@ const refreshToken = z.object({
   }),
 });
 
+const forgotPassword = z.object({
+  body: z.object({
+    email: z
+      .string({ error: "Email is required" })
+      .email("Invalid email address"),
+  }),
+});
+
+const resetPassword = z.object({
+  body: z.object({
+    token: z.string({ error: "Token is required" }),
+    newPassword: passwordSchema,
+  }),
+});
+
 export const AuthValidation = {
   register,
   login,
   changePassword,
   refreshToken,
+  forgotPassword,
+  resetPassword,
 };

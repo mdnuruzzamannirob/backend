@@ -6,7 +6,7 @@ const { combine, timestamp, printf, colorize, errors, json } = winston.format;
 
 const logsDir = path.join(process.cwd(), "logs");
 
-// ── Console format (human-friendly, colorised) ─────────────────────────────
+// ── Console format (human-friendly, colorized) ─────────────────────────────
 const consoleFormat = combine(
   colorize({ all: true }),
   timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),

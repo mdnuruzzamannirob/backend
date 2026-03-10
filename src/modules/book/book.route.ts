@@ -3,6 +3,7 @@ import { BookController } from "./book.controller";
 import { BookValidation } from "./book.validation";
 import validateRequest from "../../middleware/validate";
 import auth from "../../middleware/auth";
+import { upload } from "../../middleware/upload";
 
 const router = Router();
 
@@ -28,5 +29,13 @@ router
     BookController.updateBook,
   )
   .delete(auth("admin"), BookController.deleteBook);
+
+// Cover image upload
+router.patch(
+  "/:id/cover",
+  auth("admin"),
+  upload.single("coverImage"),
+  BookController.uploadCoverImage,
+);
 
 export const BookRoutes = router;

@@ -3,6 +3,8 @@ import { StatusCodes } from "http-status-codes";
 import { BookService } from "./book.service";
 import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
+import { uploadToCloudinary } from "../../utils/fileUpload";
+import AppError from "../../errors/AppError";
 
 const createBook = catchAsync(async (req: Request, res: Response) => {
   const book = await BookService.createBook(req.body);
@@ -68,10 +70,29 @@ const deleteBook = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const uploadCoverImage = catchAsync(async (req: Request, res: Response) => {
+  if (!req.file) {
+    throw new AppError("No image file provided", StatusCodes.BAD_REQUEST);
+  }
+
+  const { url } = await uploadToCloudinary(req.file.buffer, "book-covers");
+  const book = await BookService.updateBook(req.params.id as string, {
+    coverImage: url,
+  });
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: "Cover image uploaded successfully",
+    data: book,
+  });
+});
+
 export const BookController = {
   createBook,
   getAllBooks,
   getBookById,
   updateBook,
   deleteBook,
+  uploadCoverImage,
 };
