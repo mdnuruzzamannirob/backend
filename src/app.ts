@@ -1,12 +1,12 @@
 import express, { Application, Request, Response } from "express";
 import cors from "cors";
 import helmet from "helmet";
-import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import rateLimit from "express-rate-limit";
 import router from "./routes";
 import errorHandler from "./middleware/errorHandler";
 import notFound from "./middleware/notFound";
+import httpLogger from "./middleware/httpLogger";
 import { config } from "./config";
 
 const app: Application = express();
@@ -56,10 +56,8 @@ app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true, limit: "10kb" }));
 app.use(cookieParser());
 
-// Request logging (development only)
-if (config.NODE_ENV === "development") {
-  app.use(morgan("dev"));
-}
+// HTTP request logging (all environments except test)
+app.use(httpLogger);
 
 // Health check
 app.get("/health", (_req: Request, res: Response) => {

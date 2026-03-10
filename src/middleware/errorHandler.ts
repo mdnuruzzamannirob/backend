@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import { StatusCodes } from "http-status-codes";
 import AppError from "../errors/AppError";
 import { config } from "../config";
+import logger from "../utils/logger";
 
 const errorHandler = (
   err: Error,
@@ -57,6 +58,13 @@ const errorHandler = (
 
   if (config.NODE_ENV === "development") {
     response.stack = err.stack;
+  }
+
+  // Log unexpected server errors at error level; operational errors at warn
+  if (statusCode >= 500) {
+    logger.error(err.message, { stack: err.stack, statusCode });
+  } else if (!(err instanceof AppError)) {
+    logger.warn(err.message, { statusCode });
   }
 
   res.status(statusCode).json(response);
